@@ -64,8 +64,7 @@ void MostCommonStringLinkedList::readFile(string filename)
 }
 void MostCommonStringLinkedList::initializeList(int l)
 {
-	cout << "Finding most common substring of length " << l << "..." << endl;
-
+	
 	for (int i = 0; i < v.size(); i++)
 	{
 		for (int j = 0; j < v[i].size() - l + 1; j++)
@@ -227,7 +226,7 @@ int main()
 		
 	//cout << "Displaying list...\n";
 	//m.displayList();
-
+	cout << "Finding most common substring of length " << l << "..." << endl;
 	cout << "5 most common strings:" << endl;
 	m.nMostCommonStrings(5);
 
