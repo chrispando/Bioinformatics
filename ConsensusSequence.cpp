@@ -44,7 +44,7 @@ void Consensus::alignment(string fileName)
 	string s;
 	while (inputFile >> s)
 	{
-		if (strchr(nucleotides, s[0]))
+		if (strchr(nucleotides, s[0]))//validate data
 			sequences.push_back(s);
 	}
 	inputFile.close();
