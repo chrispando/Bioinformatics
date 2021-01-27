@@ -10,7 +10,7 @@ namespace DNASEQUENCES
         public static void writeToFile(List<string>input)
         {
             Console.WriteLine("Writing to file...");
-            using (StreamWriter writer = new StreamWriter("/Users/chrispando/Projects/sequences.txt"))
+            using (StreamWriter writer = new StreamWriter("/pathToFile.txt"))
             {
                 foreach (string s in input)
                 {
