@@ -4,7 +4,7 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-       ReadFile read = new ReadFile("G:\\Bioinformatics\\Sequences.txt");
+       ReadFile read = new ReadFile("/PathToFile.txt");
        List<String> DNA = new ArrayList<String>(read.fileReader());
 
        bruteForceMotifSearch bf = new bruteForceMotifSearch();
