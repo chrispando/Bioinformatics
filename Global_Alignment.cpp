@@ -115,9 +115,9 @@ void printLCS(path b, string v, int i, int j)
 }
 void LCS::longestPath()
 {
-	for (int i = 1; i < m +1; i++) 
+	for (int i = 1; i < n + 1; i++)
 	{
-		for (int j = 1; j < n +1; j++) 
+		for (int j = 1; j < m + 1; j++)
 		{
 			if (i == 0 || j == 0)
 				p[i][j] = '.';
@@ -127,29 +127,29 @@ void LCS::longestPath()
 				int s = max(max(table[i - 1][j], table[i][j - 1]), table[i - 1][j - 1]);
 				p[i][j] = '\\';
 			}
-			
-			else 
+
+			else
 			{
-				if (table[i - 1][j] > table[i][j - 1]) 
-					p[i][j] ='|';  
-				
-				else 
+				int s = max(max(table[i - 1][j], table[i][j - 1]), table[i - 1][j - 1]);
+				if (table[i - 1][j] > table[i][j - 1])
+					p[i][j] = '|';
+
+				else
 				{
 					table[i][j] = table[i][j - 1];
-					p[i][j] ='-';  
+					p[i][j] = '-';
 				}
 			}
 		}
 	}
 	printLCS(p, v, n, m);
 	printContents(p);
-	
 }
 
 int main()
 {
-	string v = "CGATAAC";
-	string w = "AACGTTAC";
+	string v = "ATGTTAT";
+	string w = "ATGCTAC";
 
 	LCS longest(v, w);
 
