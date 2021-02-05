@@ -1,6 +1,3 @@
-////Solve the Manhattan Tourist Problem
-
-////Determine optimal path from source to sink
 #include<iostream>
 #include<vector>
 #include<string>
@@ -8,16 +5,16 @@
 #include<iomanip>
 using namespace std;
 
-typedef vector<vector<int>> myVec;
+typedef vector<vector<int>> table;
 typedef vector<vector<char>> path;
+
+//To change weights for matches, gaps, and mismatches, edit the variables in class LCS
 class LCS
 {
 private:
-	string v;
-	string w;
-	int m;
-	int n;
-	myVec table;
+	string v, w;
+	int m, n;
+	table t;
 	path p;
 	vector<int>num;
 	vector<char>c;
@@ -26,7 +23,7 @@ private:
 	int mismatch = -1;
 
 	template<class T>
-	void printContents(vector<vector<T>>);
+	void printVector(vector<vector<T>>);
 public:
 	LCS(string v, string w)
 	{
@@ -37,17 +34,19 @@ public:
 	}
 
 	void generateTable();
-	void longestPath();
+	void longestCommonSubsequence();
+	void printLCS(path, string, int, int);
+
 };
 
 template<class T>
-void LCS::printContents(vector<vector<T>>a)
+void LCS::printVector(vector<vector<T>>a)
 {
 	for (int index = 0; index < a.size(); index++)
 	{
 		for (int i = 0; i < a[index].size(); i++)
-			std::cout << setw(3) << a[index][i];
-		std::cout << endl;
+			cout << setw(3) << a[index][i];
+		cout << endl;
 	}
 }
 void LCS::generateTable()
@@ -59,7 +58,7 @@ void LCS::generateTable()
 			num.push_back(0);
 			c.push_back('.');
 		}
-		table.push_back(num);
+		t.push_back(num);
 		p.push_back(c);
 		num.clear();
 		c.clear();
@@ -67,32 +66,58 @@ void LCS::generateTable()
 
 	int s;
 	for (int index = 0; index < m + 1; index++)
-	{
-		table[0][index] += index * gap;;
-	}
+		t[0][index] += index + gap;
 	for (int index = 0; index < n + 1; index++)
-	{
-		table[index][0] += index * gap;
-	}
+		t[index][0] += index * gap;
 
-	for (int index = 1; index < n + 1; index++)
+	for (int index = 1; index < m + 1; index++)
 	{
 		for (int i = 1; i < m + 1; i++)
 		{
 			if (v[index - 1] == w[i - 1])//match
 			{
-				s = max(max(table[index - 1][i] + gap, table[index][i - 1] + gap), table[index - 1][i - 1] + match);
+				s = max(max(t[index - 1][i] + gap, t[index][i - 1] + gap), t[index - 1][i - 1] + match);
 			}
 			else//mismatch
 			{
-				s = max(max(table[index - 1][i] + gap, table[index][i - 1] + gap), table[index - 1][i - 1] + mismatch);
+				s = max(max(t[index - 1][i] + gap, t[index][i - 1] + gap), t[index - 1][i - 1] + mismatch);
 			}
-			table[index][i] = s;
+			t[index][i] = s;
 		}
 	}
-	printContents(table);
+	printVector(t);
 }
-void printLCS(path b, string v, int i, int j)
+void LCS::longestCommonSubsequence()
+{
+	for (int index = 1; index < n + 1; index++)
+	{
+		for (int i = 1; i < m + 1; i++)
+		{
+			if (index == 0 || i == 0)
+				p[index][i] == '.';
+			else if (v[index-1] == w[i-1])
+			{
+				int s = max(max(t[index - 1][i], t[index][i - 1]), t[index - 1][i - 1]);
+				p[index][i] = '\\';
+			}
+			else
+			{
+				int s = max(max(t[index - 1][i], t[index][i - 1]), t[index - 1][i - 1]);
+				if (t[index - 1][i] > t[index][i - 1])
+					p[index][i] = '|';
+
+				else
+				{
+					t[index][i] = t[index][i - 1];
+					p[index][i] = '-';
+				}
+			}
+		}
+	}
+	printLCS(p, w, n, m);
+	printVector(p);
+}
+void LCS::printLCS(path b, string v, int i, int j)
 {
 	if (i == 0 || j == 0)
 	{
@@ -101,7 +126,7 @@ void printLCS(path b, string v, int i, int j)
 	if (b[i][j] == '\\')
 	{
 		printLCS(b, v, i - 1, j - 1);
-		cout << v[i-1] << endl;
+		cout << v[i - 1] << endl;
 	}
 	else
 	{
@@ -113,38 +138,6 @@ void printLCS(path b, string v, int i, int j)
 			printLCS(b, v, i, j - 1);
 	}
 }
-void LCS::longestPath()
-{
-	for (int i = 1; i < n + 1; i++)
-	{
-		for (int j = 1; j < m + 1; j++)
-		{
-			if (i == 0 || j == 0)
-				p[i][j] = '.';
-
-			else if (v[i - 1] == w[j - 1])
-			{
-				int s = max(max(table[i - 1][j], table[i][j - 1]), table[i - 1][j - 1]);
-				p[i][j] = '\\';
-			}
-
-			else
-			{
-				int s = max(max(table[i - 1][j], table[i][j - 1]), table[i - 1][j - 1]);
-				if (table[i - 1][j] > table[i][j - 1])
-					p[i][j] = '|';
-
-				else
-				{
-					table[i][j] = table[i][j - 1];
-					p[i][j] = '-';
-				}
-			}
-		}
-	}
-	printLCS(p, v, n, m);
-	printContents(p);
-}
 
 int main()
 {
@@ -154,7 +147,7 @@ int main()
 	LCS longest(v, w);
 
 	longest.generateTable();
-	longest.longestPath();
+	longest.longestCommonSubsequence();
 
 	std::cin.get();
 	return 0;
