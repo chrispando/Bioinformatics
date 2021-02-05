@@ -9,7 +9,7 @@
 using namespace std;
 
 typedef vector<vector<int>> myVec;
-
+typedef vector<vector<char>> path;
 class LCS
 {
 private:
@@ -18,11 +18,15 @@ private:
 	int m;
 	int n;
 	myVec table;
+	path p;
 	vector<int>num;
+	vector<char>c;
 	int match = 1;
 	int gap = -1;
 	int mismatch = -1;
-	void printContents(myVec);
+
+	template<class T>
+	void printContents(vector<vector<T>>);
 public:
 	LCS(string v, string w)
 	{
@@ -31,12 +35,13 @@ public:
 		m = w.length();
 		n = v.length();
 	}
-	
+
 	void generateTable();
 	void longestPath();
 };
 
-void LCS::printContents(myVec a)
+template<class T>
+void LCS::printContents(vector<vector<T>>a)
 {
 	for (int index = 0; index < a.size(); index++)
 	{
@@ -52,9 +57,12 @@ void LCS::generateTable()
 		for (int i = 0; i < m + 1; i++)
 		{
 			num.push_back(0);
+			c.push_back('.');
 		}
 		table.push_back(num);
+		p.push_back(c);
 		num.clear();
+		c.clear();
 	}
 
 	int s;
@@ -84,135 +92,64 @@ void LCS::generateTable()
 	}
 	printContents(table);
 }
-void LCS::longestPath()
+void printLCS(path b, string v, int i, int j)
 {
-	int rowNum = 0;
-	int colNum = 0;
-	int Score = 0;
-	while (rowNum < n || colNum < m)
+	if (i == 0 || j == 0)
 	{
-		int numVal = table[rowNum][colNum];
-		//there are more columns than rows in this case
-		if (rowNum < n && colNum < m)
+		return;
+	}
+	if (b[i][j] == '\\')
+	{
+		printLCS(b, v, i - 1, j - 1);
+		cout << v[i-1] << endl;
+	}
+	else
+	{
+		if (b[i][j] == '|')
 		{
-			int a = table[rowNum + 1][colNum];
-			int b = table[rowNum][colNum + 1];
-			int c = table[rowNum + 1][colNum + 1];
-		}
-		else if (rowNum == n)
-		{
-
-		}
-		else if (colNum == m)
-		{
-
-		}
-
-
-		int bestCol = 0;
-		int bestRow = 0;
-		bool moveRight = false;
-		bool moveDown = false;
-
-		for (int i = 0; i < m; i++)
-		{
-			if (numVal < table[rowNum][i])
-			{
-				//std::cout << "\tFound better column placement: " << i << endl;
-				bestCol = i;
-				moveRight = true;
-				break;
-			}
-		}
-		for (int i = 0; i < n; i++)
-		{
-			if (numVal < table[i][colNum])
-			{
-				//std::cout << "\tFound better row placement: " << i << endl;
-				bestRow = i;
-				moveDown = true;
-				break;
-			}
-		}
-		if (rowNum == v.length() || colNum == w.length())
-		{
-			//std::cout << "Terminal" << endl;
-			if (rowNum == n)
-			{
-				colNum++;
-			}
-			if (colNum == m)
-			{
-				rowNum++;
-			}
-		}
-		else if (moveRight || moveDown)
-		{
-			//std::cout << "Flag" << endl;
-			if (moveRight && moveDown)
-			{
-				if ((table[bestRow][colNum]) > (table[rowNum][bestCol]))
-				{
-					rowNum++;
-
-				}
-				else if ((table[bestRow][colNum]) < (table[rowNum][bestCol]))
-				{
-					colNum++;
-
-				}
-				else
-				{
-					rowNum++;
-					colNum++;
-
-				}
-			}
-			else if (moveRight && !moveDown)
-			{
-				colNum++;
-			}
-			else if (!moveRight && moveDown)
-			{
-				rowNum++;
-			}
-			else
-			{
-				std::cout << "Move Error.\n";
-			}
+			printLCS(b, v, i - 1, j);
 		}
 		else
+			printLCS(b, v, i, j - 1);
+	}
+}
+void LCS::longestPath()
+{
+	for (int i = 1; i < m +1; i++) 
+	{
+		for (int j = 1; j < n +1; j++) 
 		{
-			//std::cout << "No Flag" << endl;
-			if (table[rowNum + 1][colNum] > table[rowNum][colNum + 1] && table[rowNum + 1][colNum] > table[rowNum + 1][colNum + 1])
-			{
-				rowNum++;
+			if (i == 0 || j == 0)
+				p[i][j] = '.';
 
+			else if (v[i - 1] == w[j - 1])
+			{
+				int s = max(max(table[i - 1][j], table[i][j - 1]), table[i - 1][j - 1]);
+				p[i][j] = '\\';
 			}
-			else if (table[rowNum][colNum + 1] > table[rowNum + 1][colNum] && table[rowNum][colNum + 1] > table[rowNum + 1][colNum + 1])
+			
+			else 
 			{
-				colNum++;
-
-			}
-			else
-			{
-				rowNum++;
-				colNum++;
-
-
+				if (table[i - 1][j] > table[i][j - 1]) 
+					p[i][j] ='|';  
+				
+				else 
+				{
+					table[i][j] = table[i][j - 1];
+					p[i][j] ='-';  
+				}
 			}
 		}
-		std::cout << rowNum << "," << colNum << "\t" << table[rowNum][colNum] << endl;
-		Score += table[rowNum][colNum];
-
 	}
-	std::cout << "Score:" << Score << endl;
+	printLCS(p, v, n, m);
+	printContents(p);
+	
 }
 
 int main()
 {
-	string v = "ATGTTAT";
-	string w = "ATGCTAC";
+	string v = "CGATAAC";
+	string w = "AACGTTAC";
 
 	LCS longest(v, w);
 
