@@ -18,9 +18,10 @@ private:
 	path p;
 	vector<int>num;
 	vector<char>c;
-	int match = 1;
+	vector<char>lcs;
+	int match = 2;
 	int gap = -1;
-	int mismatch = -1;
+	int mismatch = -3;
 
 	template<class T>
 	void printVector(vector<vector<T>>);
@@ -66,56 +67,55 @@ void LCS::generateTable()
 
 	int s;
 	for (int index = 0; index < m + 1; index++)
-		t[0][index] += index + gap;
+		t[0][index] += index * gap;
 	for (int index = 0; index < n + 1; index++)
 		t[index][0] += index * gap;
 
-	for (int index = 1; index < m + 1; index++)
+	for (int index = 1; index < n + 1; index++)
 	{
 		for (int i = 1; i < m + 1; i++)
 		{
+			int a, b, c, d;
 			if (v[index - 1] == w[i - 1])//match
 			{
-				s = max(max(t[index - 1][i] + gap, t[index][i - 1] + gap), t[index - 1][i - 1] + match);
+				a = t[index - 1][i] + gap;
+				b = t[index][i - 1] + gap;
+				c = t[index - 1][i - 1] + match;
+				s = max(max(a,b ), c);
 			}
 			else//mismatch
 			{
-				s = max(max(t[index - 1][i] + gap, t[index][i - 1] + gap), t[index - 1][i - 1] + mismatch);
+				a = t[index - 1][i] + gap;
+				b = t[index][i - 1] + gap;
+				d = t[index - 1][i - 1] + mismatch;
+				s = max(max(a, b), d);
 			}
 			t[index][i] = s;
+			if (s == a)
+			{
+				p[index][i] = '|';
+			}
+			else if (s == b)
+			{
+				p[index][i] = '-';
+			}
+			else if (s == c)
+			{
+				p[index][i] = '\\';
+			}
+			else
+			{
+				p[index][i] = '0';
+			}
+			
 		}
 	}
 	printVector(t);
 }
 void LCS::longestCommonSubsequence()
 {
-	for (int index = 1; index < n + 1; index++)
-	{
-		for (int i = 1; i < m + 1; i++)
-		{
-			if (index == 0 || i == 0)
-				p[index][i] == '.';
-			else if (v[index-1] == w[i-1])
-			{
-				int s = max(max(t[index - 1][i], t[index][i - 1]), t[index - 1][i - 1]);
-				p[index][i] = '\\';
-			}
-			else
-			{
-				int s = max(max(t[index - 1][i], t[index][i - 1]), t[index - 1][i - 1]);
-				if (t[index - 1][i] > t[index][i - 1])
-					p[index][i] = '|';
-
-				else
-				{
-					t[index][i] = t[index][i - 1];
-					p[index][i] = '-';
-				}
-			}
-		}
-	}
-	printLCS(p, w, n, m);
 	printVector(p);
+	printLCS(p, v, n, m);
 }
 void LCS::printLCS(path b, string v, int i, int j)
 {
@@ -125,8 +125,9 @@ void LCS::printLCS(path b, string v, int i, int j)
 	}
 	if (b[i][j] == '\\')
 	{
+		
 		printLCS(b, v, i - 1, j - 1);
-		cout << v[i - 1] << endl;
+		cout << v[i-1];
 	}
 	else
 	{
@@ -137,12 +138,14 @@ void LCS::printLCS(path b, string v, int i, int j)
 		else
 			printLCS(b, v, i, j - 1);
 	}
+
+	
 }
 
 int main()
 {
-	string v = "ATGTTAT";
-	string w = "ATGCTAC";
+	string v = "TCCCAGTTATGTCAGGGGACACGAGCATGCAGAGAC";
+	string w = "AATTGCCGCCGTCGTTTTCAGCAGTTATGTCAGATC";
 
 	LCS longest(v, w);
 
